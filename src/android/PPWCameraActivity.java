@@ -741,7 +741,8 @@ public class PPWCameraActivity extends Activity {
         @Override
         public void onPictureTaken(byte[] imageData, Camera camera) {
 
-            alert("Camera.PictureCallback");
+            Toast.makeText(PPWCameraActivity.this, "Camera.PictureCallback",Toast.LENGTH_SHORT).show();
+            
             final String timeStamp = String.valueOf(System.currentTimeMillis());
             final String FILENAME = timeStamp + "."+mEncodingType;
             final String FILENAME_THUMB = timeStamp + "_thumb."+mEncodingType;
