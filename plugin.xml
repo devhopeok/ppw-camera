@@ -2,12 +2,12 @@
 	<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
 		xmlns:android="http://schemas.android.com/apk/res/android"
 		xmlns:rim="http://www.blackberry.com/ns/widgets"
-		id="com.appnovation.ppw-camera"
+		id="com.app.ppw-camera"
 		version="1.0.18">
 
 	<name>PPW Camera</name>
 	<description>PhoneGap plugin to support a custom camera overlay</description>
-	<author>Appnovation Technologies</author>
+	<author>app Technologies</author>
 
 	<info>
 		Property Pres Wizards custom camera overlay plugin
@@ -69,19 +69,19 @@
 	<platform name="android">
 
     <config-file target="AndroidManifest.xml" parent="/manifest/application">
-      <activity android:label="PPWCameraActivity" android:name="com.appnovation.ppw_camera.PPWCameraActivity" android:screenOrientation="sensorLandscape" android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+      <activity android:label="PPWCameraActivity" android:name="com.app.ppw_camera.PPWCameraActivity" android:screenOrientation="sensorLandscape" android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
       </activity>
     </config-file>
 
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="PPWCamera">
-          <param name="android-package" value="com.appnovation.ppw_camera.PPWCamera"/>
+          <param name="android-package" value="com.app.ppw_camera.PPWCamera"/>
       </feature>
     </config-file>
 
-    <source-file src="src/android/PPWCamera.java" target-dir="src/com/appnovation/ppw_camera" />
-    <source-file src="src/android/PPWCameraActivity.java" target-dir="src/com/appnovation/ppw_camera" />
-    <source-file src="src/android/PPWCameraPreview.java" target-dir="src/com/appnovation/ppw_camera" />
+    <source-file src="src/android/PPWCamera.java" target-dir="src/com/app/ppw_camera" />
+    <source-file src="src/android/PPWCameraActivity.java" target-dir="src/com/app/ppw_camera" />
+    <source-file src="src/android/PPWCameraPreview.java" target-dir="src/com/app/ppw_camera" />
     <source-file src="src/android/activity_ppw_camera.xml" target-dir="res/layout"/>
     <source-file src="src/android/sanselan-0.97-incubator.jar" target-dir="libs" />
 

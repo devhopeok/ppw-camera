@@ -3,7 +3,7 @@
 //  PPWCamera
 //
 //  Created by Paul on 2014-10-20.
-//  Copyright (c) 2014 Appnovation. All rights reserved.
+//  Copyright (c) 2014 app. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

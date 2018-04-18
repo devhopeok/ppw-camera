@@ -3,7 +3,7 @@
   "version": "1.0.18",
   "description": "PhoneGap plugin to support a custom camera overlay",
   "cordova": {
-    "id": "com.appnovation.ppw-camera",
+    "id": "com.app.ppw-camera",
     "platforms": [
       "ios",
       "android"

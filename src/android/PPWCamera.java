@@ -1,4 +1,4 @@
-package com.appnovation.ppw_camera;
+package com.app.ppw_camera;
 
 import java.io.File;
 import java.io.Serializable;

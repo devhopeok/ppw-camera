@@ -1,4 +1,4 @@
-package com.appnovation.ppw_camera;
+package com.app.ppw_camera;
 
 import org.apache.cordova.LOG;
 import org.apache.cordova.PluginResult;
