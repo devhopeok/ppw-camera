@@ -1,0 +1,33 @@
+{
+  "name": "ppw-camera-test",
+  "version": "1.0.18",
+  "description": "PhoneGap plugin to support a custom camera overlay",
+  "cordova": {
+    "id": "com.appnovation.ppw-camera",
+    "platforms": [
+      "ios",
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitofwebmobiledev@github.com/gitofwebmobiledev/ppw-camera.git"
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-ios",
+    "cordova-android"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.1.0"
+    }
+  ],
+  "author": "Shane",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gitofwebmobiledev/ppw-camera/issues"
+  },
+  "homepage": "https://github.com/gitofwebmobiledev/ppw-camera#readme"
+}
