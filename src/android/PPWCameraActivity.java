@@ -812,22 +812,22 @@ public class PPWCameraActivity extends Activity {
                     //     output.put("data",data);
                     // }
 
-                    // //update thumbnail
-                    // if (mThumbnail > 0) {
-                    //     //setup image view
-                    //     Bitmap image = BitmapFactory.decodeByteArray(imageResize, 0, imageResize.length);
-                    //     imageViewButton.setImageBitmap(image);
-                    //     imageViewButton.setVisibility(View.INVISIBLE);
+                    //update thumbnail
+                    if (mThumbnail > 0) {
+                        //setup image view
+                        Bitmap image = BitmapFactory.decodeByteArray(imageResize, 0, imageResize.length);
+                        imageViewButton.setImageBitmap(image);
+                        imageViewButton.setVisibility(View.INVISIBLE);
 
-                    //     int radius = (int)(mPhotoWidth*(mThumbnail*0.01f));
-                    //     if (mPhotoHeight > mPhotoWidth) {
-                    //         radius = (int)(mPhotoHeight*(mThumbnail*0.01f));
-                    //     }
+                        int radius = (int)(mPhotoWidth*(mThumbnail*0.01f));
+                        if (mPhotoHeight > mPhotoWidth) {
+                            radius = (int)(mPhotoHeight*(mThumbnail*0.01f));
+                        }
 
-                    //     Bitmap thumb = ThumbnailUtils.extractThumbnail(image, radius, radius);
-                    //     thumbButton.setImageBitmap(getCircleBitmap(thumb));
-                    //     thumbButton.setVisibility(View.VISIBLE);
-                    // }
+                        Bitmap thumb = ThumbnailUtils.extractThumbnail(image, radius, radius);
+                        thumbButton.setImageBitmap(getCircleBitmap(thumb));
+                        thumbButton.setVisibility(View.VISIBLE);
+                    }
 
                     // Log.d(TAG, output.toString());
                     PluginResult result = new PluginResult(PluginResult.Status.OK, output);
