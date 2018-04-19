@@ -461,7 +461,7 @@ public class PPWCameraActivity extends Activity {
             mBackNotify = options.optBoolean("backNotify",false);
             mFlashType = options.optString("flashType",FLASH_NAME_AUTO);
             mConfirmationTimeInterval = options.optInt("confirmTimeInterval",500);
-            mConfirmErrorMessage = options.optString("confirmErrorMessage","Error confirming photo captured");
+            mConfirmErrorMessage = options.optString("confirmErrorMessage","Error to confirm photo captured");
             mDateFontSize = options.optInt("dateFontSize",20);
             mDateFormat = options.optString("dateFormat","");
             mShutterSoundOff = options.optBoolean("shutterSoundOff", false);
