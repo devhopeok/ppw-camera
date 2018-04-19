@@ -740,8 +740,6 @@ public class PPWCameraActivity extends Activity {
 
         @Override
         public void onPictureTaken(byte[] imageData, Camera camera) {
-
-            Toast.makeText(PPWCameraActivity.this, "Camera.PictureCallback",Toast.LENGTH_SHORT).show();
             
             final String timeStamp = String.valueOf(System.currentTimeMillis());
             final String FILENAME = timeStamp + "."+mEncodingType;
@@ -836,9 +834,9 @@ public class PPWCameraActivity extends Activity {
                     result.setKeepCallback(true);
                     PPWCamera.openCameraCallbackContext.sendPluginResult(result);
 
-                    //start timer to check for confirmation
-                    mConfirmationTimer.removeCallbacks(showConfirmErrorPopup);
-                    mConfirmationTimer.postDelayed(showConfirmErrorPopup, (long)mConfirmationTimeInterval);
+                    // //start timer to check for confirmation
+                    // mConfirmationTimer.removeCallbacks(showConfirmErrorPopup);
+                    // mConfirmationTimer.postDelayed(showConfirmErrorPopup, (long)mConfirmationTimeInterval);
                 }
 
             } catch (Exception e) {
