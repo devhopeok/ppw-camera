@@ -442,7 +442,7 @@ public class PPWCameraActivity extends Activity {
         mBackNotify = false;
         mFlashType = FLASH_NAME_AUTO;
         mConfirmationTimeInterval = 500;
-        mConfirmErrorMessage = "Error confirming photo captured";
+        mConfirmErrorMessage = "Error to confirm photo captured";
         mDateFontSize = 20;
         mShutterSoundOff = false;
 
