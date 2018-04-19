@@ -837,7 +837,6 @@ public class PPWCameraActivity extends Activity {
                     // //start timer to check for confirmation
                     // mConfirmationTimer.removeCallbacks(showConfirmErrorPopup);
                     // mConfirmationTimer.postDelayed(showConfirmErrorPopup, (long)mConfirmationTimeInterval);
-                    PPWCameraActivity.this.finish();
                 }
 
             } catch (Exception e) {
