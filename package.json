@@ -1,6 +1,6 @@
 {
   "name": "ppw-camera-test",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "description": "PhoneGap plugin to support a custom camera overlay",
   "cordova": {
     "id": "com.app.ppw-camera",

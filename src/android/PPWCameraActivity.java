@@ -777,61 +777,61 @@ public class PPWCameraActivity extends Activity {
 
                 //save if space available
                 else {
-                    //add meta deta
-                    if (mEncodingType.compareToIgnoreCase("png") != 0) {
-                        imageResize = addJPEGExifTagsFromSource(imageData, imageResize);
-                    }
+                    // //add meta deta
+                    // if (mEncodingType.compareToIgnoreCase("png") != 0) {
+                    //     imageResize = addJPEGExifTagsFromSource(imageData, imageResize);
+                    // }
 
-                    //create new
-                    FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-                    fos.write(imageResize);
-                    fos.close();
-                    String imagePath = getFilesDir() + "/" + FILENAME;
+                    // //create new
+                    // FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+                    // fos.write(imageResize);
+                    // fos.close();
+                    // String imagePath = getFilesDir() + "/" + FILENAME;
 
-                    String imagePathThumb = "";
-                    if (imageThumb != null) {
-                        fos = openFileOutput(FILENAME_THUMB, Context.MODE_PRIVATE);
-                        fos.write(imageThumb);
-                        fos.close();
-                        imagePathThumb = getFilesDir() + "/" + FILENAME_THUMB;
-                    }
+                    // String imagePathThumb = "";
+                    // if (imageThumb != null) {
+                    //     fos = openFileOutput(FILENAME_THUMB, Context.MODE_PRIVATE);
+                    //     fos.write(imageThumb);
+                    //     fos.close();
+                    //     imagePathThumb = getFilesDir() + "/" + FILENAME_THUMB;
+                    // }
 
-                    String hash = hmacSha512(bytesToHex(imageResize), SECRET_KEY);
+                    // String hash = hmacSha512(bytesToHex(imageResize), SECRET_KEY);
 
                     JSONObject output = new JSONObject();
-                    output.put("imageURI",imagePath);
-                    output.put("imageThumbURI",imagePathThumb);
-                    output.put("lastModifiedDate",timeStamp);
-                    output.put("size",imageResize.length);
-                    output.put("type",mEncodingType);
-                    output.put("hash",hash);
-                    output.put("flashType",mFlashType);
-                    if (!mDataOutput.isEmpty()) {
-                        JSONObject data = new JSONObject();
-                        for (HashMap.Entry<String, String> entry : mDataOutput.entrySet()) {
-                            data.put(entry.getKey(),entry.getValue());
-                        }
-                        output.put("data",data);
-                    }
+                    // output.put("imageURI",imagePath);
+                    // output.put("imageThumbURI",imagePathThumb);
+                    // output.put("lastModifiedDate",timeStamp);
+                    // output.put("size",imageResize.length);
+                    // output.put("type",mEncodingType);
+                    // output.put("hash",hash);
+                    // output.put("flashType",mFlashType);
+                    // if (!mDataOutput.isEmpty()) {
+                    //     JSONObject data = new JSONObject();
+                    //     for (HashMap.Entry<String, String> entry : mDataOutput.entrySet()) {
+                    //         data.put(entry.getKey(),entry.getValue());
+                    //     }
+                    //     output.put("data",data);
+                    // }
 
-                    //update thumbnail
-                    if (mThumbnail > 0) {
-                        //setup image view
-                        Bitmap image = BitmapFactory.decodeByteArray(imageResize, 0, imageResize.length);
-                        imageViewButton.setImageBitmap(image);
-                        imageViewButton.setVisibility(View.INVISIBLE);
+                    // //update thumbnail
+                    // if (mThumbnail > 0) {
+                    //     //setup image view
+                    //     Bitmap image = BitmapFactory.decodeByteArray(imageResize, 0, imageResize.length);
+                    //     imageViewButton.setImageBitmap(image);
+                    //     imageViewButton.setVisibility(View.INVISIBLE);
 
-                        int radius = (int)(mPhotoWidth*(mThumbnail*0.01f));
-                        if (mPhotoHeight > mPhotoWidth) {
-                            radius = (int)(mPhotoHeight*(mThumbnail*0.01f));
-                        }
+                    //     int radius = (int)(mPhotoWidth*(mThumbnail*0.01f));
+                    //     if (mPhotoHeight > mPhotoWidth) {
+                    //         radius = (int)(mPhotoHeight*(mThumbnail*0.01f));
+                    //     }
 
-                        Bitmap thumb = ThumbnailUtils.extractThumbnail(image, radius, radius);
-                        thumbButton.setImageBitmap(getCircleBitmap(thumb));
-                        thumbButton.setVisibility(View.VISIBLE);
-                    }
+                    //     Bitmap thumb = ThumbnailUtils.extractThumbnail(image, radius, radius);
+                    //     thumbButton.setImageBitmap(getCircleBitmap(thumb));
+                    //     thumbButton.setVisibility(View.VISIBLE);
+                    // }
 
-                    Log.d(TAG, output.toString());
+                    // Log.d(TAG, output.toString());
                     PluginResult result = new PluginResult(PluginResult.Status.OK, output);
                     result.setKeepCallback(true);
                     PPWCamera.openCameraCallbackContext.sendPluginResult(result);
