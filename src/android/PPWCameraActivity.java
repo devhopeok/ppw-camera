@@ -31,6 +31,7 @@ import android.graphics.Paint.Style;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.hardware.SensorManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
@@ -109,7 +110,8 @@ public class PPWCameraActivity extends Activity {
     private int mDateFontSize;
     private String mDateFormat;
     private boolean mShutterSoundOff;
-
+    public static String FILENAME_THUMB;
+    public static String FILENAME;
     ImageButton thumbButton;
     ImageButton imageViewButton;
 
@@ -740,8 +742,107 @@ public class PPWCameraActivity extends Activity {
 
         @Override
         public void onPictureTaken(byte[] imageData, Camera camera) {
-            
-            new SavePhotoTask().execute(imageData);
+
+            final String timeStamp = String.valueOf(System.currentTimeMillis());
+            FILENAME = timeStamp + "."+mEncodingType;
+            FILENAME_THUMB = timeStamp + "_thumb."+mEncodingType;
+
+            try {
+                //check disk space
+                File path = Environment.getDataDirectory();
+                StatFs stat = new StatFs(path.getPath());
+                long blockSize = stat.getBlockSize();
+                long availableBlocks = stat.getAvailableBlocks();
+                long availableBytes = blockSize*availableBlocks;
+                byte[] imageResize = resizeImage(imageData, mPhotoWidth, mPhotoHeight, true);
+                byte[] imageThumb = null;
+                if (mThumbnail > 0) {
+                    imageThumb = resizeImage(imageResize, (int)(mPhotoWidth*mThumbnail*0.01f), (int)(mPhotoHeight*mThumbnail*0.01f), false);
+                }
+                int dataLength = imageResize.length;
+                if (mThumbnail > 0) {
+                    dataLength += imageThumb.length;
+                }
+
+                if (availableBytes <= dataLength) {
+
+                    String availSize = Formatter.formatFileSize(PPWCameraActivity.this, availableBytes);
+
+                    new AlertDialog.Builder(PPWCameraActivity.this)
+                            .setTitle("Unable to Save - Disk Full")
+                            .setMessage("Available space: " + availSize)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
+                }
+
+                //save if space available
+                else {
+                    //add meta deta
+                    if (mEncodingType.compareToIgnoreCase("png") != 0) {
+                        imageResize = addJPEGExifTagsFromSource(imageData, imageResize);
+                    }
+
+                    //create new
+                    new SavePhotoTask().execute(imageResize);
+                    String imagePath = getFilesDir() + "/" + FILENAME;
+
+                    String imagePathThumb = "";
+
+                    if (imageThumb != null) {
+                        new SavePhotoThumbTask().execute(imageThumb);
+                        imagePathThumb = getFilesDir() + "/" + FILENAME_THUMB;
+                    }
+
+                    String hash = hmacSha512(bytesToHex(imageResize), SECRET_KEY);
+
+                    JSONObject output = new JSONObject();
+                    output.put("imageURI",imagePath);
+                    output.put("imageThumbURI",imagePathThumb);
+                    output.put("lastModifiedDate",timeStamp);
+                    output.put("size",imageResize.length);
+                    output.put("type",mEncodingType);
+                    output.put("hash",hash);
+                    output.put("flashType",mFlashType);
+                    if (!mDataOutput.isEmpty()) {
+                        JSONObject data = new JSONObject();
+                        for (HashMap.Entry<String, String> entry : mDataOutput.entrySet()) {
+                            data.put(entry.getKey(),entry.getValue());
+                        }
+                        output.put("data",data);
+                    }
+
+                    //update thumbnail
+                    if (mThumbnail > 0) {
+                        //setup image view
+                        Bitmap image = BitmapFactory.decodeByteArray(imageResize, 0, imageResize.length);
+                        imageViewButton.setImageBitmap(image);
+                        imageViewButton.setVisibility(View.INVISIBLE);
+
+                        int radius = (int)(mPhotoWidth*(mThumbnail*0.01f));
+                        if (mPhotoHeight > mPhotoWidth) {
+                            radius = (int)(mPhotoHeight*(mThumbnail*0.01f));
+                        }
+
+                        Bitmap thumb = ThumbnailUtils.extractThumbnail(image, radius, radius);
+                        thumbButton.setImageBitmap(getCircleBitmap(thumb));
+                        thumbButton.setVisibility(View.VISIBLE);
+                    }
+
+                    // Log.d(TAG, output.toString());
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, output);
+                    result.setKeepCallback(true);
+                    PPWCamera.openCameraCallbackContext.sendPluginResult(result);
+
+                    // //start timer to check for confirmation
+                    // mConfirmationTimer.removeCallbacks(showConfirmErrorPopup);
+                    // mConfirmationTimer.postDelayed(showConfirmErrorPopup, (long)mConfirmationTimeInterval);
+                }
+
+            } catch (Exception e) {
+                Log.d(TAG, "File not found Error: " + e.getMessage());
+                sendError();
+            }
+
             camera.cancelAutoFocus();
             camera.stopPreview();
             camera.startPreview();
@@ -961,114 +1062,36 @@ public class PPWCameraActivity extends Activity {
         }
     }
 
+    class SavePhotoThumbTask extends AsyncTask<byte[], String, String> {
+        @Override
+        protected String doInBackground(byte[]... jpeg) {
+
+            try {
+                FileOutputStream fos = openFileOutput(FILENAME_THUMB, Context.MODE_PRIVATE);
+                fos.write(jpeg[0]);
+                fos.close();
+            }
+            catch (java.io.IOException e) {
+                Log.e("PictureDemo", "Exception in photoCallback", e);
+            }
+            return(null);
+        }
+    }
+
     class SavePhotoTask extends AsyncTask<byte[], String, String> {
         @Override
         protected String doInBackground(byte[]... jpeg) {
-            final String timeStamp = String.valueOf(System.currentTimeMillis());
-            final String FILENAME = timeStamp + "."+mEncodingType;
-            final String FILENAME_THUMB = timeStamp + "_thumb."+mEncodingType;
 
             try {
-                //check disk space
-                File path = Environment.getDataDirectory();
-                StatFs stat = new StatFs(path.getPath());
-                long blockSize = stat.getBlockSize();
-                long availableBlocks = stat.getAvailableBlocks();
-                long availableBytes = blockSize*availableBlocks;
-                byte[] imageResize = resizeImage(imageData, mPhotoWidth, mPhotoHeight, true);
-                byte[] imageThumb = null;
-                if (mThumbnail > 0) {
-                    imageThumb = resizeImage(imageResize, (int)(mPhotoWidth*mThumbnail*0.01f), (int)(mPhotoHeight*mThumbnail*0.01f), false);
-                }
-                int dataLength = imageResize.length;
-                if (mThumbnail > 0) {
-                    dataLength += imageThumb.length;
-                }
+                Log.d("Path", FILENAME);
+                FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+                fos.write(jpeg[0]);
+                fos.close();
 
-                if (availableBytes <= dataLength) {
-
-                    String availSize = Formatter.formatFileSize(PPWCameraActivity.this, availableBytes);
-
-                    new AlertDialog.Builder(PPWCameraActivity.this)
-                            .setTitle("Unable to Save - Disk Full")
-                            .setMessage("Available space: " + availSize)
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show();
-                }
-
-                //save if space available
-                else {
-                    //add meta deta
-                    if (mEncodingType.compareToIgnoreCase("png") != 0) {
-                        imageResize = addJPEGExifTagsFromSource(imageData, imageResize);
-                    }
-
-                    //create new
-                    FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-                    fos.write(imageResize);
-                    fos.close();
-                    String imagePath = getFilesDir() + "/" + FILENAME;
-
-                    String imagePathThumb = "";
-
-                    Toast.makeText(PPWCameraActivity.this, getFilesDir(), Toast.LENGTH_LONG).show();
-                    if (imageThumb != null) {
-                        fos = openFileOutput(FILENAME_THUMB, Context.MODE_PRIVATE);
-                        fos.write(imageThumb);
-                        fos.close();
-                        imagePathThumb = getFilesDir() + "/" + FILENAME_THUMB;
-                    }
-
-                    String hash = hmacSha512(bytesToHex(imageResize), SECRET_KEY);
-
-                    JSONObject output = new JSONObject();
-                    output.put("imageURI",imagePath);
-                    output.put("imageThumbURI",imagePathThumb);
-                    output.put("lastModifiedDate",timeStamp);
-                    output.put("size",imageResize.length);
-                    output.put("type",mEncodingType);
-                    output.put("hash",hash);
-                    output.put("flashType",mFlashType);
-                    if (!mDataOutput.isEmpty()) {
-                        JSONObject data = new JSONObject();
-                        for (HashMap.Entry<String, String> entry : mDataOutput.entrySet()) {
-                            data.put(entry.getKey(),entry.getValue());
-                        }
-                        output.put("data",data);
-                    }
-
-                    //update thumbnail
-                    if (mThumbnail > 0) {
-                        //setup image view
-                        Bitmap image = BitmapFactory.decodeByteArray(imageResize, 0, imageResize.length);
-                        imageViewButton.setImageBitmap(image);
-                        imageViewButton.setVisibility(View.INVISIBLE);
-
-                        int radius = (int)(mPhotoWidth*(mThumbnail*0.01f));
-                        if (mPhotoHeight > mPhotoWidth) {
-                            radius = (int)(mPhotoHeight*(mThumbnail*0.01f));
-                        }
-
-                        Bitmap thumb = ThumbnailUtils.extractThumbnail(image, radius, radius);
-                        thumbButton.setImageBitmap(getCircleBitmap(thumb));
-                        thumbButton.setVisibility(View.VISIBLE);
-                    }
-
-                    // Log.d(TAG, output.toString());
-                    PluginResult result = new PluginResult(PluginResult.Status.OK, output);
-                    result.setKeepCallback(true);
-                    PPWCamera.openCameraCallbackContext.sendPluginResult(result);
-
-                    // //start timer to check for confirmation
-                    // mConfirmationTimer.removeCallbacks(showConfirmErrorPopup);
-                    // mConfirmationTimer.postDelayed(showConfirmErrorPopup, (long)mConfirmationTimeInterval);
-                }
-
-            } catch (Exception e) {
-                Log.d(TAG, "File not found Error: " + e.getMessage());
-                sendError();
             }
-
+            catch (java.io.IOException e) {
+                Log.e("PictureDemo", "Exception in photoCallback", e);
+            }
             return(null);
         }
     }
